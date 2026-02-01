@@ -17,6 +17,17 @@
   <link rel="canonical" href="{{ page.url | url }}" />
 
   <link rel="stylesheet" href="/assets/style.css" />
+<meta property="og:type" content="video.other" />
+<meta property="og:title" content="{{ title or 'AgenMicat' }}" />
+<meta property="og:description" content="{{ description or 'Blog video AgenMicat' }}" />
+<meta property="og:url" content="{{ page.url | url }}" />
+
+{% if youtube_id %}
+  <meta property="og:image" content="https://i.ytimg.com/vi/{{ youtube_id }}/hqdefault.jpg" />
+{% else %}
+  <meta property="og:image" content="/assets/og-default.jpg" />
+{% endif %}
+
 </head>
 
 <body>
