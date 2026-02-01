@@ -4,6 +4,9 @@ layout: video.njk
 permalink: "/posts/video-ajawatir/"
 youtube_id: "1e28XhyqZj4"
 description: "Sulih suara video dengan Adobe Audition"
+tags: ["Adventure", "Drama"]
+category: "Movies"
+
 ---
 
 # Video Ke Delapan 🎬
