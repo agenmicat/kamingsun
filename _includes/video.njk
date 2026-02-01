@@ -16,6 +16,14 @@ layout: base.njk
     {% else %}
       <p><b>youtube_id belum diisi</b> di front matter post ini.</p>
     {% endif %}
+    {% if tags %}
+      <div class="chips">
+        {% for t in tags %}
+          <a class="chip" href="/tags/{{ t | url }}/">#{{ t }}</a>
+        {% endfor %}
+      </div>
+    {% endif %}
+
 {# === Next / Prev (berdasarkan urutan collections.posts) === #}
 {% set posts = collections.posts %}
 {% set idx = -1 %}
