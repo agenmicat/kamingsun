@@ -1,0 +1,51 @@
+---
+layout: base.njk
+---
+
+<div class="watch">
+  <div class="watch-main">
+    <h1 class="watch-title">{{ title }}</h1>
+
+    {% if youtube_id %}
+      <div class="player">
+        <iframe
+          src="https://www.youtube.com/embed/{{ youtube_id }}"
+          allowfullscreen
+          loading="lazy"></iframe>
+      </div>
+    {% else %}
+      <p><b>youtube_id belum diisi</b> di front matter post ini.</p>
+    {% endif %}
+
+    {% if description %}
+      <div class="watch-desc">
+        {{ description | safe }}
+      </div>
+    {% endif %}
+
+    <div class="watch-content">
+      {{ content | safe }}
+    </div>
+  </div>
+
+  <aside class="watch-side">
+    <div class="side-title">Video lainnya</div>
+
+    <ul class="side-list">
+      {% for p in collections.posts %}
+        {% if p.url != page.url %}
+          <li class="side-item">
+            <a class="side-thumb" href="{{ p.url }}">
+              {% if p.data.youtube_id %}
+                <img src="https://i.ytimg.com/vi/{{ p.data.youtube_id }}/mqdefault.jpg" alt="{{ p.data.title }}">
+              {% endif %}
+            </a>
+            <div class="side-info">
+              <a class="side-name" href="{{ p.url }}">{{ p.data.title }}</a>
+            </div>
+          </li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+  </aside>
+</div>
