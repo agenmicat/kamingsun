@@ -88,21 +88,72 @@ layout: base.njk
   <aside class="watch-side">
     <div class="side-title">Video lainnya</div>
 
-    <ul class="side-list">
-      {% for p in collections.posts %}
-        {% if p.url != page.url %}
-          <li class="side-item">
-            <a class="side-thumb" href="{{ p.url }}">
-              {% if p.data.youtube_id %}
-                <img src="https://i.ytimg.com/vi/{{ p.data.youtube_id }}/mqdefault.jpg" alt="{{ p.data.title }}">
-              {% endif %}
-            </a>
-            <div class="side-info">
-              <a class="side-name" href="{{ p.url }}">{{ p.data.title }}</a>
-            </div>
-          </li>
+    {% set currentCat = category %}
+{% set currentTags = tags or [] %}
+{% set limit = 8 %}
+{% set count = 0 %}
+
+<ul class="side-list">
+  {# 1) category sama dulu #}
+  {% for p in collections.posts %}
+    {% if count < limit and p.url != page.url and currentCat and p.data.category == currentCat %}
+      <li class="side-item">
+        <a class="side-thumb" href="{{ p.url }}">
+          {% if p.data.youtube_id %}
+            <img src="https://i.ytimg.com/vi/{{ p.data.youtube_id }}/mqdefault.jpg" alt="{{ p.data.title }}">
+          {% endif %}
+        </a>
+        <div class="side-info">
+          <a class="side-name" href="{{ p.url }}">{{ p.data.title }}</a>
+        </div>
+      </li>
+      {% set count = count + 1 %}
+    {% endif %}
+  {% endfor %}
+
+  {# 2) kalau masih kurang: tag yang sama #}
+  {% for p in collections.posts %}
+    {% if count < limit and p.url != page.url %}
+      {% set ptags = p.data.tags or [] %}
+      {% set match = false %}
+      {% for t in currentTags %}
+        {% if t and (t in ptags) %}
+          {% set match = true %}
         {% endif %}
       {% endfor %}
-    </ul>
+
+      {% if match %}
+        <li class="side-item">
+          <a class="side-thumb" href="{{ p.url }}">
+            {% if p.data.youtube_id %}
+              <img src="https://i.ytimg.com/vi/{{ p.data.youtube_id }}/mqdefault.jpg" alt="{{ p.data.title }}">
+            {% endif %}
+          </a>
+          <div class="side-info">
+            <a class="side-name" href="{{ p.url }}">{{ p.data.title }}</a>
+          </div>
+        </li>
+        {% set count = count + 1 %}
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+
+  {# 3) fallback: isi sisa dengan video terbaru lainnya #}
+  {% for p in collections.posts %}
+    {% if count < limit and p.url != page.url %}
+      <li class="side-item">
+        <a class="side-thumb" href="{{ p.url }}">
+          {% if p.data.youtube_id %}
+            <img src="https://i.ytimg.com/vi/{{ p.data.youtube_id }}/mqdefault.jpg" alt="{{ p.data.title }}">
+          {% endif %}
+        </a>
+        <div class="side-info">
+          <a class="side-name" href="{{ p.url }}">{{ p.data.title }}</a>
+        </div>
+      </li>
+      {% set count = count + 1 %}
+    {% endif %}
+  {% endfor %}
+</ul>
   </aside>
 </div>
