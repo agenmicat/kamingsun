@@ -13,6 +13,14 @@ module.exports = function (eleventyConfig) {
     });
     return [...tags].sort();
   });
+  eleventyConfig.addCollection("categoryList", (collectionApi) => {
+    const cats = new Set();
+  collectionApi.getAll().forEach((item) => {
+    const c = item.data.category;
+      if (c) cats.add(c);
+    });
+    return [...cats].sort();
+  });
 
   return {
     dir: {
