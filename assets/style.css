@@ -308,3 +308,13 @@ a:hover{text-decoration:underline}
   opacity:.5;
   cursor:not-allowed;
 }
+.chips{ display:flex; flex-wrap:wrap; gap:8px; margin:10px 0 6px; }
+.chip{
+  font-size:12px;
+  padding:6px 10px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  background:rgba(255,255,255,.03);
+  text-decoration:none;
+}
+.chip:hover{ text-decoration:underline; }
