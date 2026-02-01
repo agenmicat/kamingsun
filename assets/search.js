@@ -28,6 +28,11 @@
       resultsEl.innerHTML = `<div class="search-empty">Tidak ada hasil.</div>`;
       return;
     }
+    
+  function getQueryParam(name) {
+    const params = new URLSearchParams(window.location.search);
+    return params.get(name) || "";
+    }
 
     resultsEl.innerHTML = items.map(({ item }) => {
       const tags = (item.tags || []).slice(0, 6).map(t => `<span class="pill">#${t}</span>`).join("");
