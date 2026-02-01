@@ -7,6 +7,38 @@ layout: base.njk
   <div class="watch-main">
     {# Title #}
     <h1 class="watch-title">{{ title }}</h1>
+{% if video and video.provider == "youtube" %}
+  <div class="player">
+    <iframe src="https://www.youtube.com/embed/{{ video.id }}" allowfullscreen loading="lazy"></iframe>
+  </div>
+
+{% elif video and video.provider == "cloudflare" %}
+  <div class="player">
+    <iframe
+      src="https://iframe.videodelivery.net/{{ video.id }}"
+      allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
+      allowfullscreen
+      loading="lazy"></iframe>
+  </div>
+
+{% elif video and video.provider == "bunny" %}
+  <div class="player">
+    <iframe
+      src="https://iframe.mediadelivery.net/embed/{{ video.zone }}/{{ video.id }}"
+      allowfullscreen
+      loading="lazy"></iframe>
+  </div>
+
+{% elif video and video.provider == "self" %}
+  <div class="player">
+    <video controls preload="metadata" poster="{{ video.poster }}">
+      <source src="{{ video.src }}" type="video/mp4">
+    </video>
+  </div>
+
+{% else %}
+  <p><b>Video belum dikonfigurasi.</b></p>
+{% endif %}
 
     {# Video Player #}
     {% if youtube_id %}
