@@ -24,6 +24,11 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addGlobalData("site", {
     url: "https://agenmicat.pages.dev"
   });
+  eleventyConfig.addFilter("isoDate", (value) => {
+    if (!value) return "";
+    const d = new Date(value);
+  return d.toISOString().slice(0, 10);
+  });
 
   return {
     dir: {
