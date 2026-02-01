@@ -15,7 +15,9 @@ layout: base.njk
     </a>
 
     <div class="video-info">
-      <h2 class="video-title"><a href="{{ post.url }}">{{ post.data.title }}</a></h2>
+      <h2 class="video-title">
+        <a href="{{ post.url }}">{{ post.data.title }}</a>
+      </h2>
       {% if post.data.date %}
         <div class="video-meta">{{ post.data.date | date: "%d %b %Y" }}</div>
       {% endif %}
