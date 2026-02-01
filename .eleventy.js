@@ -6,6 +6,13 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addCollection("posts", (collectionApi) => {
     return collectionApi.getFilteredByGlob("posts/*.md").reverse();
   });
+  eleventyConfig.addCollection("tagList", (collectionApi) => {
+    const tags = new Set();
+  collectionApi.getAll().forEach((item) => {
+    (item.data.tags || []).forEach((t) => tags.add(t));
+    });
+    return [...tags].sort();
+  });
 
   return {
     dir: {
