@@ -1,14 +1,12 @@
 ---
-title: Video kelima
-date: 2026-01-01
-layout: base.njk
+title: Video Ketujuh
+layout: video.njk
+permalink: "/posts/video-ketujuh/"
 youtube_id: "BPielIpGPI0"
+description: "Deskripsi singkat video (boleh 1-2 kalimat)."
 ---
 
-# Video Ke Empat 🎬
+# Video Ke Ketujuh 🎬
 
-Ini video ke Empat saya.
-
-<iframe width="560" height="315" src="https://www.youtube.com/embed/BPielIpGPI0?si=ZoolcJOnKSPMmNz8" frameborder="0" allowfullscreen></iframe>
-
+Ini video ke Ketujuh saya.
 Deskripsi video ditulis pakai Markdown.
