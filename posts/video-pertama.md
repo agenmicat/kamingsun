@@ -2,6 +2,7 @@
 title: Video Pertama
 date: 2026-01-01
 layout: base.njk
+youtube_id: "BPielIpGPI0"
 ---
 
 # Video Pertama 🎬
