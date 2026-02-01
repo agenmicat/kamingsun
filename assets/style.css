@@ -259,3 +259,52 @@ a:hover{text-decoration:underline}
 }
 
 .side-name:hover{ text-decoration:underline; }
+/* Next / Prev navigation */
+.watch-nav{
+  margin-top:14px;
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:12px;
+}
+
+@media (max-width: 700px){
+  .watch-nav{ grid-template-columns: 1fr; }
+}
+
+.nav-btn{
+  display:block;
+  padding:12px 12px;
+  border:1px solid var(--border);
+  border-radius:14px;
+  background:rgba(0,0,0,.12);
+  color:var(--text);
+  text-decoration:none;
+}
+
+.nav-btn:hover{
+  background:rgba(255,255,255,.03);
+  text-decoration:none;
+}
+
+.nav-next{
+  text-align:right;
+}
+
+.nav-label{
+  display:block;
+  color:var(--muted);
+  font-size:12px;
+  margin-bottom:4px;
+}
+
+.nav-title{
+  display:block;
+  font-weight:700;
+  font-size:14px;
+  line-height:1.25;
+}
+
+.nav-disabled{
+  opacity:.5;
+  cursor:not-allowed;
+}
