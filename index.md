@@ -13,6 +13,7 @@ layout: base.njk
         <img src="https://i.ytimg.com/vi/{{ post.data.youtube_id }}/hqdefault.jpg" alt="{{ post.data.title }}">
       {% endif %}
     </a>
+
     <div class="video-info">
       <h2 class="video-title">
         <a href="{{ post.url }}">{{ post.data.title }}</a>
