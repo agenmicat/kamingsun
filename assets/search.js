@@ -3,49 +3,26 @@
   const resultsEl = document.getElementById("results");
   const hintEl = document.getElementById("hint");
 
-  let data = [];
-  try {
-    const res = await fetch("/search.json", { cache: "no-store" });
-    data = await res.json();
-  } catch (e) {
-    hintEl.textContent = "Gagal memuat search index (/search.json).";
-    return;
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, (m) => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    }[m]));
   }
 
-  const fuse = new Fuse(data, {
-    includeScore: true,
-    threshold: 0.35, // makin kecil makin ketat
-    keys: [
-      { name: "title", weight: 0.6 },
-      { name: "tags", weight: 0.3 },
-      { name: "category", weight: 0.2 },
-      { name: "description", weight: 0.2 }
-    ]
-  });
+  function getQueryParam(name) {
+    const params = new URLSearchParams(window.location.search);
+    return (params.get(name) || "").trim();
+  }
 
-  function render(items) {
-    if (!items.length) {
+  function render(found) {
+    if (!found.length) {
       resultsEl.innerHTML = `<div class="search-empty">Tidak ada hasil.</div>`;
       return;
     }
-    
-  function getQueryParam(name) {
-    const params = new URLSearchParams(window.location.search);
-    return params.get(name) || "";
-    }
-    const initial = getQueryParam("q");
-    if (initial) {
-      q.value = initial;
-      setTimeout(() => {
-    const found = fuse.search(initial).slice(0, 20);
-      render(found);
-        hintEl.textContent = "";
-        }, 0);
-    }
 
-    resultsEl.innerHTML = items.map(({ item }) => {
-      const tags = (item.tags || []).slice(0, 6).map(t => `<span class="pill">#${t}</span>`).join("");
-      const cat = item.category ? `<span class="pill pill-cat">${item.category}</span>` : "";
+    resultsEl.innerHTML = found.map(({ item }) => {
+      const tags = (item.tags || []).slice(0, 6).map(t => `<span class="pill">#${escapeHtml(t)}</span>`).join("");
+      const cat = item.category ? `<span class="pill pill-cat">${escapeHtml(item.category)}</span>` : "";
       const desc = item.description ? `<div class="result-desc">${escapeHtml(item.description)}</div>` : "";
 
       return `
@@ -58,23 +35,54 @@
     }).join("");
   }
 
-  function escapeHtml(s) {
-    return String(s).replace(/[&<>"']/g, m => ({
-      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
-    }[m]));
+  // Load index
+  let data = [];
+  try {
+    const res = await fetch("/search.json", { cache: "no-store" });
+    data = await res.json();
+  } catch (e) {
+    hintEl.textContent = "Gagal memuat search index (/search.json).";
+    return;
   }
 
-  function onInput() {
-    const term = (q.value || "").trim();
-    if (term.length < 2) {
+  // Pastikan Fuse tersedia
+  if (typeof Fuse === "undefined") {
+    hintEl.textContent = "Fuse.js belum termuat. Cek script CDN di halaman /search/.";
+    return;
+  }
+
+  const fuse = new Fuse(data, {
+    includeScore: true,
+    threshold: 0.35,
+    keys: [
+      { name: "title", weight: 0.6 },
+      { name: "tags", weight: 0.3 },
+      { name: "category", weight: 0.2 },
+      { name: "description", weight: 0.2 }
+    ]
+  });
+
+  function doSearch(term) {
+    const t = (term || "").trim();
+    if (t.length < 2) {
       hintEl.textContent = "Ketik minimal 2 huruf.";
       resultsEl.innerHTML = "";
       return;
     }
     hintEl.textContent = "";
-    const found = fuse.search(term).slice(0, 20); // max hasil
+    const found = fuse.search(t).slice(0, 20);
     render(found);
   }
 
-  q.addEventListener("input", onInput);
+  // Input handler (live)
+  q.addEventListener("input", () => doSearch(q.value));
+
+  // ✅ Auto-search from URL: /search/?q=drama
+  const initial = getQueryParam("q");
+  if (initial) {
+    q.value = initial;
+    doSearch(initial);
+  } else {
+    hintEl.textContent = "Ketik minimal 2 huruf.";
+  }
 })();
