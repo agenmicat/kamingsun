@@ -318,3 +318,21 @@ a:hover{text-decoration:underline}
   text-decoration:none;
 }
 .chip:hover{ text-decoration:underline; }
+/* Badge category di thumbnail */
+.thumb{ position:relative; }
+
+.badge{
+  position:absolute;
+  left:10px;
+  bottom:10px;
+  padding:6px 10px;
+  font-size:12px;
+  font-weight:700;
+  color:var(--text);
+  background:rgba(0,0,0,.55);
+  border:1px solid var(--border);
+  border-radius:999px;
+  backdrop-filter: blur(4px);
+  text-transform: lowercase;
+}
+
