@@ -21,6 +21,9 @@ module.exports = function (eleventyConfig) {
     });
     return [...cats].sort();
   });
+  eleventyConfig.addGlobalData("site", {
+    url: "https://agenmicat.pages.dev"
+  });
 
   return {
     dir: {
