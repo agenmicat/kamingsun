@@ -1,6 +1,7 @@
 ---
 title: Video kelima
 date: 2026-01-01
+layout: base.njk
 ---
 
 # Video Ke kelima 🎬
