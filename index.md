@@ -16,11 +16,19 @@ layout: base.njk
 {% for post in collections.posts %}
   <li class="video-card">
     <a class="thumb" href="{{ post.url }}">
-      {% if post.data.video.provider == "youtube" %}
-          <img src="https://i.ytimg.com/vi/{{ post.data.video.id }}/hqdefault.jpg">
-            {% elif post.data.thumbnail %}
-          <img src="{{ post.data.thumbnail }}">
-      {% endif %}
+      {% set yid = "" %}
+{# format baru #}
+{% if post.data.video and post.data.video.provider == "youtube" and post.data.video.id %}
+  {% set yid = post.data.video.id %}
+{# format lama #}
+{% elif post.data.youtube_id %}
+  {% set yid = post.data.youtube_id %}
+{% endif %}
+{% if yid %}
+  <img src="https://i.ytimg.com/vi/{{ yid }}/hqdefault.jpg" alt="{{ post.data.title }}">
+{% elif post.data.thumbnail %}
+  <img src="{{ post.data.thumbnail }}" alt="{{ post.data.title }}">
+{% endif %}
       {% if post.data.category %}
         <span class="badge">{{ post.data.category }}</span>
       {% endif %}
