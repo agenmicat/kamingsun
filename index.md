@@ -16,8 +16,10 @@ layout: base.njk
 {% for post in collections.posts %}
   <li class="video-card">
     <a class="thumb" href="{{ post.url }}">
-      {% if post.data.youtube_id %}
-        <img src="https://i.ytimg.com/vi/{{ post.data.youtube_id }}/hqdefault.jpg" alt="{{ post.data.title }}">
+      {% if post.data.video.provider == "youtube" %}
+          <img src="https://i.ytimg.com/vi/{{ post.data.video.id }}/hqdefault.jpg">
+            {% elif post.data.thumbnail %}
+          <img src="{{ post.data.thumbnail }}">
       {% endif %}
       {% if post.data.category %}
         <span class="badge">{{ post.data.category }}</span>
