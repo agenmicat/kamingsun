@@ -3,9 +3,22 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{% if title %}{{ title }} · {% endif %}AgenMicat</title>
+
+  <title>
+    {% if title %}{{ title }} · {% endif %}AgenMicat
+  </title>
+
+  {% if description %}
+    <meta name="description" content="{{ description }}">
+  {% else %}
+    <meta name="description" content="Blog video AgenMicat – kumpulan video pilihan, tutorial, dan hiburan.">
+  {% endif %}
+
+  <link rel="canonical" href="{{ page.url | url }}" />
+
   <link rel="stylesheet" href="/assets/style.css" />
 </head>
+
 <body>
   <div class="container">
     <div class="header">
