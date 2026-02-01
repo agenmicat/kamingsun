@@ -335,4 +335,28 @@ a:hover{text-decoration:underline}
   backdrop-filter: blur(4px);
   text-transform: lowercase;
 }
+/* Category row */
+.cat-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:12px;
+}
+
+.cat-pill{
+  display:inline-block;
+  padding:8px 12px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:rgba(255,255,255,.03);
+  color:var(--text);
+  text-decoration:none;
+  font-weight:700;
+  font-size:13px;
+  text-transform: lowercase;
+}
+
+.cat-pill:hover{
+  text-decoration:underline;
+}
 
