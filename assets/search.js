@@ -33,6 +33,15 @@
     const params = new URLSearchParams(window.location.search);
     return params.get(name) || "";
     }
+    const initial = getQueryParam("q");
+    if (initial) {
+      q.value = initial;
+      setTimeout(() => {
+    const found = fuse.search(initial).slice(0, 20);
+      render(found);
+        hintEl.textContent = "";
+        }, 0);
+    }
 
     resultsEl.innerHTML = items.map(({ item }) => {
       const tags = (item.tags || []).slice(0, 6).map(t => `<span class="pill">#${t}</span>`).join("");
