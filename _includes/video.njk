@@ -26,13 +26,20 @@ layout: base.njk
   {% endif %}
 {% endfor %}
 
-{# Karena posts biasanya sudah newest → oldest (karena reverse),
-   maka:
-   - berikutnya (newer) = posts[idx - 1]
-   - sebelumnya (older) = posts[idx + 1]
+{% set nextPost = null %}
+{% set prevPost = null %}
+
+{# posts newest → oldest (karena reverse di .eleventy.js)
+   berikutnya (newer) = posts[idx - 1]
+   sebelumnya (older) = posts[idx + 1]
 #}
-{% set nextPost = (idx > 0) ? posts[idx - 1] : null %}
-{% set prevPost = (idx >= 0 and idx < (posts | length) - 1) ? posts[idx + 1] : null %}
+{% if idx > 0 %}
+  {% set nextPost = posts[idx - 1] %}
+{% endif %}
+
+{% if idx >= 0 and idx < (posts | length) - 1 %}
+  {% set prevPost = posts[idx + 1] %}
+{% endif %}
 
 <nav class="watch-nav">
   {% if prevPost %}
@@ -59,7 +66,6 @@ layout: base.njk
     </span>
   {% endif %}
 </nav>
-
     {% if description %}
       <div class="watch-desc">
         {{ description | safe }}
