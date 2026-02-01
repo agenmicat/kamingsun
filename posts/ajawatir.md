@@ -1,5 +1,5 @@
 ---
-title: Video Kedelapan
+title: TEMPAT KEKACAUAN, KEMISKINAN DAN TENAGA KERJA MURAH!
 layout: video.njk
 permalink: "/posts/video-ajawatir/"
 youtube_id: "1e28XhyqZj4"
