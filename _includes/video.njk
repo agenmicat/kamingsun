@@ -16,6 +16,49 @@ layout: base.njk
     {% else %}
       <p><b>youtube_id belum diisi</b> di front matter post ini.</p>
     {% endif %}
+{# === Next / Prev (berdasarkan urutan collections.posts) === #}
+{% set posts = collections.posts %}
+{% set idx = -1 %}
+
+{% for p in posts %}
+  {% if p.url == page.url %}
+    {% set idx = loop.index0 %}
+  {% endif %}
+{% endfor %}
+
+{# Karena posts biasanya sudah newest → oldest (karena reverse),
+   maka:
+   - berikutnya (newer) = posts[idx - 1]
+   - sebelumnya (older) = posts[idx + 1]
+#}
+{% set nextPost = (idx > 0) ? posts[idx - 1] : null %}
+{% set prevPost = (idx >= 0 and idx < (posts | length) - 1) ? posts[idx + 1] : null %}
+
+<nav class="watch-nav">
+  {% if prevPost %}
+    <a class="nav-btn" href="{{ prevPost.url }}">
+      <span class="nav-label">Sebelumnya</span>
+      <span class="nav-title">{{ prevPost.data.title }}</span>
+    </a>
+  {% else %}
+    <span class="nav-btn nav-disabled">
+      <span class="nav-label">Sebelumnya</span>
+      <span class="nav-title">Tidak ada</span>
+    </span>
+  {% endif %}
+
+  {% if nextPost %}
+    <a class="nav-btn nav-next" href="{{ nextPost.url }}">
+      <span class="nav-label">Berikutnya</span>
+      <span class="nav-title">{{ nextPost.data.title }}</span>
+    </a>
+  {% else %}
+    <span class="nav-btn nav-disabled nav-next">
+      <span class="nav-label">Berikutnya</span>
+      <span class="nav-title">Tidak ada</span>
+    </span>
+  {% endif %}
+</nav>
 
     {% if description %}
       <div class="watch-desc">
