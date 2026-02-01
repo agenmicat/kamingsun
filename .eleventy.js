@@ -1,7 +1,8 @@
 module.exports = function (eleventyConfig) {
 
   eleventyConfig.addCollection("posts", function (collectionApi) {
-    return collectionApi.getFilteredByGlob("posts/*.md");
+    return collectionApi.getFilteredByGlob("post/*.md")
+	reverse();
   });
 
   return {
