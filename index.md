@@ -1,5 +1,5 @@
 ---
-title: Blog Video Saya
+title: Blog Video
 layout: base.njk
 ---
 
@@ -8,10 +8,12 @@ layout: base.njk
 <ul class="post-list">
 {% for post in collections.posts %}
   <li class="post-card">
-    <h2><a href="{{ post.url }}">{{ post.data.title }}</a></h2>
-    {% if post.data.date %}
-      <div class="post-meta">{{ post.data.date | date: "%d %b %Y" }}</div>
+    {% if post.data.youtube_id %}
+      <a href="{{ post.url }}">
+        <img src="https://i.ytimg.com/vi/{{ post.data.youtube_id }}/hqdefault.jpg" alt="{{ post.data.title }}">
+      </a>
     {% endif %}
+    <h2><a href="{{ post.url }}">{{ post.data.title }}</a></h2>
   </li>
 {% endfor %}
 </ul>
