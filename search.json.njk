@@ -3,14 +3,16 @@ permalink: "/search.json"
 eleventyExcludeFromCollections: true
 ---
 
-[
+{% set items = [] %}
+
 {% for p in collections.posts %}
-  {
-    "title": {{ p.data.title | dump }},
-    "url": {{ p.url | dump }},
-    "category": {{ (p.data.category or "") | dump }},
-    "tags": {{ (p.data.tags or []) | dump }},
-    "description": {{ (p.data.description or "") | dump }}
-  }{% if not loop.last %},{% endif %}
+  {% set items = items.concat([{
+    title: p.data.title,
+    url: p.url,
+    category: (p.data.category or ""),
+    tags: (p.data.tags or []),
+    description: (p.data.description or "")
+  }]) %}
 {% endfor %}
-]
+
+{{ items | dump | safe }}
