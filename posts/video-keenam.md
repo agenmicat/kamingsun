@@ -1,10 +1,12 @@
 ---
+
 title: Temui Orang-Orang Kalash
 layout: video.njk
 permalink: "/posts/video-keenam/"
 youtube_id: "YaTaBGVfg48"
 description: "Menyelami lembah-lembah terpencil di Pakistan utara untuk bertemu dengan orang-orang Kalash"
 ---
+
 
 # Video Ke Delapan 🎬
 
