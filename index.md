@@ -2,6 +2,14 @@
 title: Blog Video
 layout: base.njk
 ---
+<form action="/search/" method="get" class="home-search">
+  <input
+    type="search"
+    name="q"
+    placeholder="Cari video, tag, kategori…"
+    aria-label="Cari"
+  />
+</form>
 
 # Daftar Video 🎬
 <ul class="video-grid">
