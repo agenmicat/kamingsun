@@ -1,0 +1,25 @@
+---
+layout: base.njk
+pagination:
+  data: collections
+  size: 1
+  alias: tag
+permalink: "/tags/{{ tag | url }}/"
+---
+
+# Tag: {{ tag }}
+
+<ul class="video-grid">
+{% for post in collections[tag] %}
+  <li class="video-card">
+    <a class="thumb" href="{{ post.url }}">
+      {% if post.data.youtube_id %}
+        <img src="https://i.ytimg.com/vi/{{ post.data.youtube_id }}/hqdefault.jpg" alt="{{ post.data.title }}">
+      {% endif %}
+    </a>
+    <div class="video-info">
+      <h2 class="video-title"><a href="{{ post.url }}">{{ post.data.title }}</a></h2>
+    </div>
+  </li>
+{% endfor %}
+</ul>
