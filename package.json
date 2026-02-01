@@ -1,0 +1,7 @@
+{
+  "name": "kamingsun",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "npx @11ty/eleventy"
+  }
+}
