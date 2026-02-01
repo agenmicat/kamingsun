@@ -4,7 +4,7 @@ module.exports = function (eleventyConfig) {
     return collectionApi.getFilteredByGlob("post/*.md")
 	reverse();
   });
-
+	eleventyConfig.addPassthroughCopy("assets");
   return {
     dir: {
       input: ".",
