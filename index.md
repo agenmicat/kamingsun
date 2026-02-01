@@ -20,7 +20,6 @@ layout: base.njk
       {% if post.data.date %}
   <div class="video-meta">{{ post.data.date }}</div>
 {% endif %}
-
     </div>
   </li>
 {% endfor %}
