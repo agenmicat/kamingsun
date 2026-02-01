@@ -3,19 +3,25 @@ layout: base.njk
 ---
 
 <div class="watch">
+  {# ========== MAIN CONTENT ========== #}
   <div class="watch-main">
+    {# Title #}
     <h1 class="watch-title">{{ title }}</h1>
 
+    {# Video Player #}
     {% if youtube_id %}
       <div class="player">
         <iframe
           src="https://www.youtube.com/embed/{{ youtube_id }}"
           allowfullscreen
-          loading="lazy"></iframe>
+          loading="lazy">
+        </iframe>
       </div>
     {% else %}
       <p><b>youtube_id belum diisi</b> di front matter post ini.</p>
     {% endif %}
+
+    {# Tags #}
     {% if tags %}
       <div class="chips">
         {% for t in tags %}
@@ -24,136 +30,148 @@ layout: base.njk
       </div>
     {% endif %}
 
-{# === Next / Prev (berdasarkan urutan collections.posts) === #}
-{% set posts = collections.posts %}
-{% set idx = -1 %}
+    {# ========== NAVIGATION (Next/Prev) ========== #}
+    {% set posts = collections.posts %}
+    {% set idx = -1 %}
 
-{% for p in posts %}
-  {% if p.url == page.url %}
-    {% set idx = loop.index0 %}
-  {% endif %}
-{% endfor %}
+    {# Find current post index #}
+    {% for p in posts %}
+      {% if p.url == page.url %}
+        {% set idx = loop.index0 %}
+      {% endif %}
+    {% endfor %}
 
-{% set nextPost = null %}
-{% set prevPost = null %}
+    {# Determine next and previous posts #}
+    {% set nextPost = null %}
+    {% set prevPost = null %}
 
-{# posts newest → oldest (karena reverse di .eleventy.js)
-   berikutnya (newer) = posts[idx - 1]
-   sebelumnya (older) = posts[idx + 1]
-#}
-{% if idx > 0 %}
-  {% set nextPost = posts[idx - 1] %}
-{% endif %}
+    {% if idx > 0 %}
+      {% set nextPost = posts[idx - 1] %}
+    {% endif %}
 
-{% if idx >= 0 and idx < (posts | length) - 1 %}
-  {% set prevPost = posts[idx + 1] %}
-{% endif %}
+    {% if idx >= 0 and idx < (posts | length) - 1 %}
+      {% set prevPost = posts[idx + 1] %}
+    {% endif %}
 
-<nav class="watch-nav">
-  {% if prevPost %}
-    <a class="nav-btn" href="{{ prevPost.url }}">
-      <span class="nav-label">Sebelumnya</span>
-      <span class="nav-title">{{ prevPost.data.title }}</span>
-    </a>
-  {% else %}
-    <span class="nav-btn nav-disabled">
-      <span class="nav-label">Sebelumnya</span>
-      <span class="nav-title">Tidak ada</span>
-    </span>
-  {% endif %}
+    {# Navigation Buttons #}
+    <nav class="watch-nav">
+      {# Previous Button #}
+      {% if prevPost %}
+        <a class="nav-btn" href="{{ prevPost.url }}">
+          <span class="nav-label">Sebelumnya</span>
+          <span class="nav-title">{{ prevPost.data.title }}</span>
+        </a>
+      {% else %}
+        <span class="nav-btn nav-disabled">
+          <span class="nav-label">Sebelumnya</span>
+          <span class="nav-title">Tidak ada</span>
+        </span>
+      {% endif %}
 
-  {% if nextPost %}
-    <a class="nav-btn nav-next" href="{{ nextPost.url }}">
-      <span class="nav-label">Berikutnya</span>
-      <span class="nav-title">{{ nextPost.data.title }}</span>
-    </a>
-  {% else %}
-    <span class="nav-btn nav-disabled nav-next">
-      <span class="nav-label">Berikutnya</span>
-      <span class="nav-title">Tidak ada</span>
-    </span>
-  {% endif %}
-</nav>
+      {# Next Button #}
+      {% if nextPost %}
+        <a class="nav-btn nav-next" href="{{ nextPost.url }}">
+          <span class="nav-label">Berikutnya</span>
+          <span class="nav-title">{{ nextPost.data.title }}</span>
+        </a>
+      {% else %}
+        <span class="nav-btn nav-disabled nav-next">
+          <span class="nav-label">Berikutnya</span>
+          <span class="nav-title">Tidak ada</span>
+        </span>
+      {% endif %}
+    </nav>
+
+    {# Description #}
     {% if description %}
       <div class="watch-desc">
         {{ description | safe }}
       </div>
     {% endif %}
 
+    {# Main Content #}
     <div class="watch-content">
       {{ content | safe }}
     </div>
   </div>
 
+  {# ========== SIDEBAR (Related Videos) ========== #}
   <aside class="watch-side">
     <div class="side-title">Video lainnya</div>
 
     {% set currentCat = category %}
-{% set currentTags = tags or [] %}
-{% set limit = 8 %}
-{% set count = 0 %}
+    {% set currentTags = tags or [] %}
+    {% set limit = 8 %}
+    {% set count = 0 %}
 
-<ul class="side-list">
-  {# 1) category sama dulu #}
-  {% for p in collections.posts %}
-    {% if count < limit and p.url != page.url and currentCat and p.data.category == currentCat %}
-      <li class="side-item">
-        <a class="side-thumb" href="{{ p.url }}">
-          {% if p.data.youtube_id %}
-            <img src="https://i.ytimg.com/vi/{{ p.data.youtube_id }}/mqdefault.jpg" alt="{{ p.data.title }}">
-          {% endif %}
-        </a>
-        <div class="side-info">
-          <a class="side-name" href="{{ p.url }}">{{ p.data.title }}</a>
-        </div>
-      </li>
-      {% set count = count + 1 %}
-    {% endif %}
-  {% endfor %}
-
-  {# 2) kalau masih kurang: tag yang sama #}
-  {% for p in collections.posts %}
-    {% if count < limit and p.url != page.url %}
-      {% set ptags = p.data.tags or [] %}
-      {% set match = false %}
-      {% for t in currentTags %}
-        {% if t and (t in ptags) %}
-          {% set match = true %}
+    <ul class="side-list">
+      {# 1) Videos with same category #}
+      {% for p in collections.posts %}
+        {% if count < limit and p.url != page.url and currentCat and p.data.category == currentCat %}
+          <li class="side-item">
+            <a class="side-thumb" href="{{ p.url }}">
+              {% if p.data.youtube_id %}
+                <img 
+                  src="https://i.ytimg.com/vi/{{ p.data.youtube_id }}/mqdefault.jpg" 
+                  alt="{{ p.data.title }}">
+              {% endif %}
+            </a>
+            <div class="side-info">
+              <a class="side-name" href="{{ p.url }}">{{ p.data.title }}</a>
+            </div>
+          </li>
+          {% set count = count + 1 %}
         {% endif %}
       {% endfor %}
 
-      {% if match %}
-        <li class="side-item">
-          <a class="side-thumb" href="{{ p.url }}">
-            {% if p.data.youtube_id %}
-              <img src="https://i.ytimg.com/vi/{{ p.data.youtube_id }}/mqdefault.jpg" alt="{{ p.data.title }}">
+      {# 2) Videos with matching tags #}
+      {% for p in collections.posts %}
+        {% if count < limit and p.url != page.url %}
+          {% set ptags = p.data.tags or [] %}
+          {% set match = false %}
+          
+          {% for t in currentTags %}
+            {% if t and (t in ptags) %}
+              {% set match = true %}
             {% endif %}
-          </a>
-          <div class="side-info">
-            <a class="side-name" href="{{ p.url }}">{{ p.data.title }}</a>
-          </div>
-        </li>
-        {% set count = count + 1 %}
-      {% endif %}
-    {% endif %}
-  {% endfor %}
+          {% endfor %}
 
-  {# 3) fallback: isi sisa dengan video terbaru lainnya #}
-  {% for p in collections.posts %}
-    {% if count < limit and p.url != page.url %}
-      <li class="side-item">
-        <a class="side-thumb" href="{{ p.url }}">
-          {% if p.data.youtube_id %}
-            <img src="https://i.ytimg.com/vi/{{ p.data.youtube_id }}/mqdefault.jpg" alt="{{ p.data.title }}">
+          {% if match %}
+            <li class="side-item">
+              <a class="side-thumb" href="{{ p.url }}">
+                {% if p.data.youtube_id %}
+                  <img 
+                    src="https://i.ytimg.com/vi/{{ p.data.youtube_id }}/mqdefault.jpg" 
+                    alt="{{ p.data.title }}">
+                {% endif %}
+              </a>
+              <div class="side-info">
+                <a class="side-name" href="{{ p.url }}">{{ p.data.title }}</a>
+              </div>
+            </li>
+            {% set count = count + 1 %}
           {% endif %}
-        </a>
-        <div class="side-info">
-          <a class="side-name" href="{{ p.url }}">{{ p.data.title }}</a>
-        </div>
-      </li>
-      {% set count = count + 1 %}
-    {% endif %}
-  {% endfor %}
-</ul>
+        {% endif %}
+      {% endfor %}
+
+      {# 3) Fallback: Latest videos #}
+      {% for p in collections.posts %}
+        {% if count < limit and p.url != page.url %}
+          <li class="side-item">
+            <a class="side-thumb" href="{{ p.url }}">
+              {% if p.data.youtube_id %}
+                <img 
+                  src="https://i.ytimg.com/vi/{{ p.data.youtube_id }}/mqdefault.jpg" 
+                  alt="{{ p.data.title }}">
+              {% endif %}
+            </a>
+            <div class="side-info">
+              <a class="side-name" href="{{ p.url }}">{{ p.data.title }}</a>
+            </div>
+          </li>
+          {% set count = count + 1 %}
+        {% endif %}
+      {% endfor %}
+    </ul>
   </aside>
 </div>
