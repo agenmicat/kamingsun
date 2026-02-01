@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ title }}{% if title %} · {% endif %}Blog</title>
+  <link rel="stylesheet" href="/assets/style.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="brand">
+        <h1>Blog Video</h1>
+        <small>WordPress + YouTube + Cloudflare Pages</small>
+      </div>
+      <div class="nav">
+        <a href="/">Home</a>
+      </div>
+    </div>
+
+    <div class="main content">
+      {{ content | safe }}
+    </div>
+
+    <div class="footer">
+      © {{ "now" | date: "%Y" }} · Dibuat dengan Eleventy + Cloudflare Pages
+    </div>
+  </div>
+</body>
+</html>
