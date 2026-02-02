@@ -455,4 +455,18 @@ a:hover{text-decoration:underline}
 .home-search input::placeholder{
   color:rgba(233,238,252,.55);
 }
+.video-tags{
+  margin-top:8px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  color:var(--muted);
+  font-size:12px;
+}
 
+.video-tags .tag{
+  padding:4px 8px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  background:rgba(255,255,255,.03);
+}
