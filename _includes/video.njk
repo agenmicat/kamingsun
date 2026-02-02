@@ -5,6 +5,10 @@ layout: base.njk
 <div class="watch">
   {# ========== MAIN CONTENT ========== #}
   <div class="watch-main">
+{% if post.data.thumbnail %}
+  <img src="{{ post.data.thumbnail }}" alt="{{ post.data.title }}">
+{% endif %}
+
     {# Title #}
     <h1 class="watch-title">{{ title }}</h1>
 {% if video and video.provider == "youtube" %}
