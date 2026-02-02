@@ -2,96 +2,96 @@
 layout: base.njk
 ---
 
+{% set posts = collections.posts %}
+{% set currentTags = tags or [] %}
+{% set limit = 8 %}
+
+{# ---------- helpers: thumbnail url ---------- #}
+{% set thumb = thumbnail or "" %}
+{% if (not thumb) and video and video.provider == "youtube" and video.id %}
+  {% set thumb = "https://i.ytimg.com/vi/" + video.id + "/hqdefault.jpg" %}
+{% endif %}
+{% if (not thumb) and video and video.provider == "cloudflare" and video.id %}
+  {% set thumb = "https://videodelivery.net/" + video.id + "/thumbnails/thumbnail.jpg" %}
+{% endif %}
+
 <div class="watch">
-  {# ========== MAIN CONTENT ========== #}
   <div class="watch-main">
-{% if post.data.thumbnail %}
-  <img src="{{ post.data.thumbnail }}" alt="{{ post.data.title }}">
-{% endif %}
-
-    {# Title #}
     <h1 class="watch-title">{{ title }}</h1>
-{% if video and video.provider == "youtube" %}
-  <div class="player">
-    <iframe src="https://www.youtube.com/embed/{{ video.id }}" allowfullscreen loading="lazy"></iframe>
-  </div>
 
-{% elif video and video.provider == "cloudflare" %}
-  <div class="player">
-    <iframe
-      src="https://iframe.videodelivery.net/{{ video.id }}"
-      allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
-      allowfullscreen
-      loading="lazy"></iframe>
-  </div>
-
-{% elif video and video.provider == "bunny" %}
-  <div class="player">
-    <iframe
-      src="https://iframe.mediadelivery.net/embed/{{ video.zone }}/{{ video.id }}"
-      allowfullscreen
-      loading="lazy"></iframe>
-  </div>
-
-{% elif video and video.provider == "self" %}
-  <div class="player">
-    <video controls preload="metadata" poster="{{ video.poster }}">
-      <source src="{{ video.src }}" type="video/mp4">
-    </video>
-  </div>
-
-{% else %}
-  <p><b>Video belum dikonfigurasi.</b></p>
-{% endif %}
-
-    {# Video Player #}
-    {% if youtube_id %}
-      <div class="player">
-        <iframe
-          src="https://www.youtube.com/embed/{{ youtube_id }}"
-          allowfullscreen
-          loading="lazy">
-        </iframe>
-      </div>
-    {% else %}
-      <p><b>youtube_id belum diisi</b> di front matter post ini.</p>
-    {% endif %}
-
-    {# Tags #}
-    {% if tags %}
+    {# Tags chips #}
+    {% if currentTags and currentTags | length > 0 %}
       <div class="chips">
-        {% for t in tags %}
+        {% for t in currentTags %}
           <a class="chip" href="/tags/{{ t | url }}/">#{{ t }}</a>
         {% endfor %}
       </div>
     {% endif %}
 
-    {# ========== NAVIGATION (Next/Prev) ========== #}
-    {% set posts = collections.posts %}
-    {% set idx = -1 %}
+    {# Player: single source of truth = video.provider #}
+    {% if video and video.provider == "youtube" and video.id %}
+      <div class="player">
+        <iframe
+          src="https://www.youtube.com/embed/{{ video.id }}"
+          allowfullscreen
+          loading="lazy"></iframe>
+      </div>
 
-    {# Find current post index #}
+    {% elif video and video.provider == "cloudflare" and video.id %}
+      <div class="player">
+        <iframe
+          src="https://iframe.videodelivery.net/{{ video.id }}"
+          allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
+          allowfullscreen
+          loading="lazy"></iframe>
+      </div>
+
+    {% elif video and video.provider == "bunny" and video.zone and video.id %}
+      <div class="player">
+        <iframe
+          src="https://iframe.mediadelivery.net/embed/{{ video.zone }}/{{ video.id }}"
+          allowfullscreen
+          loading="lazy"></iframe>
+      </div>
+
+    {% elif video and video.provider == "self" and video.src %}
+      <div class="player">
+        <video controls preload="metadata" poster="{{ video.poster }}">
+          <source src="{{ video.src }}" type="video/mp4">
+        </video>
+      </div>
+
+    {% else %}
+      <p><b>Video belum dikonfigurasi.</b> Isi front matter <code>video.provider</code> dan <code>video.id</code>.</p>
+    {% endif %}
+
+    {# Description #}
+    {% if description %}
+      <div class="watch-desc">
+        {{ description | safe }}
+      </div>
+    {% endif %}
+
+    {# Next / Prev (berdasarkan urutan collections.posts) #}
+    {% set idx = -1 %}
     {% for p in posts %}
       {% if p.url == page.url %}
         {% set idx = loop.index0 %}
       {% endif %}
     {% endfor %}
 
-    {# Determine next and previous posts #}
     {% set nextPost = null %}
     {% set prevPost = null %}
 
+    {# posts newest -> oldest (kalau kamu reverse di .eleventy.js) #}
     {% if idx > 0 %}
       {% set nextPost = posts[idx - 1] %}
     {% endif %}
-
     {% if idx >= 0 and idx < (posts | length) - 1 %}
       {% set prevPost = posts[idx + 1] %}
     {% endif %}
 
-    {# Navigation Buttons #}
     <nav class="watch-nav">
-      {# Previous Button #}
       {% if prevPost %}
         <a class="nav-btn" href="{{ prevPost.url }}">
           <span class="nav-label">Sebelumnya</span>
@@ -104,7 +104,6 @@ layout: base.njk
         </span>
       {% endif %}
 
-      {# Next Button #}
       {% if nextPost %}
         <a class="nav-btn nav-next" href="{{ nextPost.url }}">
           <span class="nav-label">Berikutnya</span>
@@ -118,54 +117,23 @@ layout: base.njk
       {% endif %}
     </nav>
 
-    {# Description #}
-    {% if description %}
-      <div class="watch-desc">
-        {{ description | safe }}
-      </div>
-    {% endif %}
-
-    {# Main Content #}
     <div class="watch-content">
       {{ content | safe }}
     </div>
   </div>
 
-  {# ========== SIDEBAR (Related Videos) ========== #}
+  {# ---------- SIDEBAR: related by TAGS (preferred) ---------- #}
   <aside class="watch-side">
     <div class="side-title">Video lainnya</div>
 
-    {% set currentCat = category %}
-    {% set currentTags = tags or [] %}
-    {% set limit = 8 %}
     {% set count = 0 %}
 
     <ul class="side-list">
-      {# 1) Videos with same category #}
-      {% for p in collections.posts %}
-        {% if count < limit and p.url != page.url and currentCat and p.data.category == currentCat %}
-          <li class="side-item">
-            <a class="side-thumb" href="{{ p.url }}">
-              {% if p.data.youtube_id %}
-                <img 
-                  src="https://i.ytimg.com/vi/{{ p.data.youtube_id }}/mqdefault.jpg" 
-                  alt="{{ p.data.title }}">
-              {% endif %}
-            </a>
-            <div class="side-info">
-              <a class="side-name" href="{{ p.url }}">{{ p.data.title }}</a>
-            </div>
-          </li>
-          {% set count = count + 1 %}
-        {% endif %}
-      {% endfor %}
-
-      {# 2) Videos with matching tags #}
-      {% for p in collections.posts %}
-        {% if count < limit and p.url != page.url %}
+      {# 1) match tags (minimal 1 tag sama) #}
+      {% for p in posts %}
+        {% if count < limit and p.url != page.url and currentTags | length > 0 %}
           {% set ptags = p.data.tags or [] %}
           {% set match = false %}
-          
           {% for t in currentTags %}
             {% if t and (t in ptags) %}
               {% set match = true %}
@@ -173,12 +141,18 @@ layout: base.njk
           {% endfor %}
 
           {% if match %}
+            {% set pthumb = p.data.thumbnail or "" %}
+            {% if (not pthumb) and p.data.video and p.data.video.provider == "youtube" and p.data.video.id %}
+              {% set pthumb = "https://i.ytimg.com/vi/" + p.data.video.id + "/mqdefault.jpg" %}
+            {% endif %}
+            {% if (not pthumb) and p.data.video and p.data.video.provider == "cloudflare" and p.data.video.id %}
+              {% set pthumb = "https://videodelivery.net/" + p.data.video.id + "/thumbnails/thumbnail.jpg" %}
+            {% endif %}
+
             <li class="side-item">
               <a class="side-thumb" href="{{ p.url }}">
-                {% if p.data.youtube_id %}
-                  <img 
-                    src="https://i.ytimg.com/vi/{{ p.data.youtube_id }}/mqdefault.jpg" 
-                    alt="{{ p.data.title }}">
+                {% if pthumb %}
+                  <img src="{{ pthumb }}" alt="{{ p.data.title }}">
                 {% endif %}
               </a>
               <div class="side-info">
@@ -190,15 +164,21 @@ layout: base.njk
         {% endif %}
       {% endfor %}
 
-      {# 3) Fallback: Latest videos #}
-      {% for p in collections.posts %}
+      {# 2) fallback latest (isi sisa) #}
+      {% for p in posts %}
         {% if count < limit and p.url != page.url %}
+          {% set pthumb = p.data.thumbnail or "" %}
+          {% if (not pthumb) and p.data.video and p.data.video.provider == "youtube" and p.data.video.id %}
+            {% set pthumb = "https://i.ytimg.com/vi/" + p.data.video.id + "/mqdefault.jpg" %}
+          {% endif %}
+          {% if (not pthumb) and p.data.video and p.data.video.provider == "cloudflare" and p.data.video.id %}
+            {% set pthumb = "https://videodelivery.net/" + p.data.video.id + "/thumbnails/thumbnail.jpg" %}
+          {% endif %}
+
           <li class="side-item">
             <a class="side-thumb" href="{{ p.url }}">
-              {% if p.data.youtube_id %}
-                <img 
-                  src="https://i.ytimg.com/vi/{{ p.data.youtube_id }}/mqdefault.jpg" 
-                  alt="{{ p.data.title }}">
+              {% if pthumb %}
+                <img src="{{ pthumb }}" alt="{{ p.data.title }}">
               {% endif %}
             </a>
             <div class="side-info">
