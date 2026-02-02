@@ -4,30 +4,49 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <title>
-    {% if title %}{{ title }} · {% endif %}AgenMicat
-  </title>
+  {# ---- absolute urls ---- #}
+  {% set siteUrl = (site and site.url) ? site.url : "" %}
+  {% set canonical = siteUrl + page.url %}
 
-  {% if description %}
-    <meta name="description" content="{{ description }}">
-  {% else %}
-    <meta name="description" content="Blog video AgenMicat – kumpulan video pilihan, tutorial, dan hiburan.">
+  {# ---- title & description ---- #}
+  <title>{% if title %}{{ title }} · {% endif %}AgenMicat</title>
+
+  {% set metaDesc = description or "Blog video AgenMicat – kumpulan video pilihan, tutorial, dan hiburan." %}
+  <meta name="description" content="{{ metaDesc }}">
+
+  <link rel="canonical" href="{{ canonical }}" />
+  <link rel="stylesheet" href="/assets/style.css" />
+
+  {# ---- Open Graph ---- #}
+  {% set ogTitle = title or "AgenMicat" %}
+  {% set ogDesc  = metaDesc %}
+
+  {# og:image priority: thumbnail -> provider-based -> default #}
+  {% set ogImage = thumbnail or "" %}
+
+  {% if (not ogImage) and video and video.provider == "youtube" and video.id %}
+    {% set ogImage = "https://i.ytimg.com/vi/" + video.id + "/hqdefault.jpg" %}
   {% endif %}
 
-  <link rel="canonical" href="{{ page.url | url }}" />
+  {% if (not ogImage) and video and video.provider == "cloudflare" and video.id %}
+    {% set ogImage = "https://videodelivery.net/" + video.id + "/thumbnails/thumbnail.jpg" %}
+  {% endif %}
 
-  <link rel="stylesheet" href="/assets/style.css" />
-<meta property="og:type" content="video.other" />
-<meta property="og:title" content="{{ title or 'AgenMicat' }}" />
-<meta property="og:description" content="{{ description or 'Blog video AgenMicat' }}" />
-<meta property="og:url" content="{{ page.url | url }}" />
+  {% if not ogImage %}
+    {% set ogImage = siteUrl + "/assets/og-default.jpg" %}
+  {% endif %}
 
-{% if youtube_id %}
-  <meta property="og:image" content="https://i.ytimg.com/vi/{{ youtube_id }}/hqdefault.jpg" />
-{% else %}
-  <meta property="og:image" content="/assets/og-default.jpg" />
-{% endif %}
+  {# og:type: homepage website, post/video video.other #}
+  {% set ogType = "website" %}
+  {% if video %}
+    {% set ogType = "video.other" %}
+  {% endif %}
 
+  <meta property="og:type" content="{{ ogType }}" />
+  <meta property="og:title" content="{{ ogTitle }}" />
+  <meta property="og:description" content="{{ ogDesc }}" />
+  <meta property="og:url" content="{{ canonical }}" />
+  <meta property="og:image" content="{{ ogImage }}" />
 </head>
 
 <body>
@@ -37,15 +56,16 @@
         <h1>AgenMicat</h1>
         <small>Koleksi Video Viral</small>
       </div>
-      <div class="nav">
-        <a href="/">Home</a>
-      </div>
     </div>
-  <div class="nav">
-    <a href="/">Home</a>
-    <a href="/categories/">Categories</a>
-    <a href="/tags/">Tags</a>
-  </div>
+
+    {# nav kamu letakkan sejajar container (di luar header) #}
+    <div class="nav">
+      <a href="/">Home</a>
+      <a href="/categories/">Categories</a>
+      <a href="/tags/">Tags</a>
+      <a href="/search/">Search</a>
+    </div>
+
     <div class="main content">
       {{ content | safe }}
     </div>
