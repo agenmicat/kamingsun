@@ -1,0 +1,32 @@
+name: Sync Cloudflare Stream to posts
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 18 * * *"  # setiap hari 18:00 UTC (~01:00 WIB)
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Generate posts from Stream
+        env:
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          CF_API_TOKEN:  ${{ secrets.CF_API_TOKEN }}
+          SITE_NAME: "AgenMicat"
+          SITE_BASE_URL: "https://agenmicat.pages.dev"
+        run: node tools/gen_stream_posts.mjs
+
+      - name: Commit & push if changed
+        run: |
+          git config user.name "stream-bot"
+          git config user.email "stream-bot@users.noreply.github.com"
+          git add posts
+          git diff --cached --quiet || git commit -m "sync: new Stream videos"
+          git push
