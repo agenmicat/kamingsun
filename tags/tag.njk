@@ -1,7 +1,7 @@
 ---
 layout: base.njk
 pagination:
-  data: collections
+  data: collections.tagList
   size: 1
   alias: tag
 permalink: "/tags/{{ tag | url }}/"
@@ -13,10 +13,19 @@ permalink: "/tags/{{ tag | url }}/"
 {% for post in collections[tag] %}
   <li class="video-card">
     <a class="thumb" href="{{ post.url }}">
-      {% if post.data.youtube_id %}
-        <img src="https://i.ytimg.com/vi/{{ post.data.youtube_id }}/hqdefault.jpg" alt="{{ post.data.title }}">
+      {% set thumb = post.data.thumbnail or "" %}
+      {% if (not thumb) and post.data.video and post.data.video.provider == "youtube" and post.data.video.id %}
+        {% set thumb = "https://i.ytimg.com/vi/" + post.data.video.id + "/hqdefault.jpg" %}
+      {% endif %}
+      {% if (not thumb) and post.data.video and post.data.video.provider == "cloudflare" and post.data.video.id %}
+        {% set thumb = "https://videodelivery.net/" + post.data.video.id + "/thumbnails/thumbnail.jpg" %}
+      {% endif %}
+
+      {% if thumb %}
+        <img src="{{ thumb }}" alt="{{ post.data.title }}">
       {% endif %}
     </a>
+
     <div class="video-info">
       <h2 class="video-title"><a href="{{ post.url }}">{{ post.data.title }}</a></h2>
     </div>
