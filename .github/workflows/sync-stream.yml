@@ -2,8 +2,13 @@ name: Sync Cloudflare Stream to posts
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 18 * * *"  # setiap hari 18:00 UTC (~01:00 WIB)
+
+concurrency:
+  group: stream-sync
+  cancel-in-progress: true
+
+permissions:
+  contents: write
 
 jobs:
   sync:
