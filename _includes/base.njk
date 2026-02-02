@@ -4,30 +4,41 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  {# ---- absolute urls ---- #}
-  {% set siteUrl = (site and site.url) ? site.url : "" %}
+  {# absolute base url #}
+  {% set siteUrl = "" %}
+  {% if site and site.url %}
+    {% set siteUrl = site.url %}
+  {% endif %}
   {% set canonical = siteUrl + page.url %}
 
-  {# ---- title & description ---- #}
   <title>{% if title %}{{ title }} · {% endif %}AgenMicat</title>
 
-  {% set metaDesc = description or "Blog video AgenMicat – kumpulan video pilihan, tutorial, dan hiburan." %}
+  {% set metaDesc = "Blog video AgenMicat – kumpulan video pilihan, tutorial, dan hiburan." %}
+  {% if description %}
+    {% set metaDesc = description %}
+  {% endif %}
   <meta name="description" content="{{ metaDesc }}">
 
   <link rel="canonical" href="{{ canonical }}" />
   <link rel="stylesheet" href="/assets/style.css" />
 
-  {# ---- Open Graph ---- #}
-  {% set ogTitle = title or "AgenMicat" %}
-  {% set ogDesc  = metaDesc %}
+  {# Open Graph #}
+  {% set ogTitle = "AgenMicat" %}
+  {% if title %}
+    {% set ogTitle = title %}
+  {% endif %}
 
-  {# og:image priority: thumbnail -> provider-based -> default #}
-  {% set ogImage = thumbnail or "" %}
+  {% set ogDesc = metaDesc %}
 
+  {% set ogImage = "" %}
+  {% if thumbnail %}
+    {% set ogImage = thumbnail %}
+  {% endif %}
+
+  {# provider fallback thumbnail #}
   {% if (not ogImage) and video and video.provider == "youtube" and video.id %}
     {% set ogImage = "https://i.ytimg.com/vi/" + video.id + "/hqdefault.jpg" %}
   {% endif %}
-
   {% if (not ogImage) and video and video.provider == "cloudflare" and video.id %}
     {% set ogImage = "https://videodelivery.net/" + video.id + "/thumbnails/thumbnail.jpg" %}
   {% endif %}
@@ -36,7 +47,6 @@
     {% set ogImage = siteUrl + "/assets/og-default.jpg" %}
   {% endif %}
 
-  {# og:type: homepage website, post/video video.other #}
   {% set ogType = "website" %}
   {% if video %}
     {% set ogType = "video.other" %}
@@ -58,7 +68,6 @@
       </div>
     </div>
 
-    {# nav kamu letakkan sejajar container (di luar header) #}
     <div class="nav">
       <a href="/">Home</a>
       <a href="/categories/">Categories</a>
