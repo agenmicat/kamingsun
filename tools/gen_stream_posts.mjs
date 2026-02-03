@@ -67,8 +67,8 @@ function mdForVideo(v) {
   const rawTitle = v?.meta?.name || `Video ${uid}`;
   const title = cleanTitle(rawTitle);
 
-  const category = "Video";
-  const tags = ["Cloudflare", "Stream"]; // kamu bisa ubah
+  const category = "Bokep Indo";
+  const tags = ["Ngewe", "Ngentot"]; // kamu bisa ubah
 
   return `---
 title: ${yamlEscape(title)}
