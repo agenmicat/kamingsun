@@ -1,18 +1,23 @@
 import fs from "fs";
 import path from "path";
 
+// Pastikan variabel lingkungan tersedia
 const ACCOUNT_ID = process.env.CF_ACCOUNT_ID;
 const API_TOKEN  = process.env.CF_API_TOKEN;
 
 if (!ACCOUNT_ID || !API_TOKEN) {
-  console.error("Missing CF_ACCOUNT_ID or CF_API_TOKEN env var.");
+  console.error("Error: Missing CF_ACCOUNT_ID or CF_API_TOKEN env var.");
   process.exit(1);
 }
 
 const POSTS_DIR = "posts";
-fs.mkdirSync(POSTS_DIR, { recursive: true });
 
-// slug sederhana
+// Pastikan folder posts ada
+if (!fs.existsSync(POSTS_DIR)) {
+  fs.mkdirSync(POSTS_DIR, { recursive: true });
+}
+
+// Fungsi untuk membuat slug yang rapi untuk URL/Nama File
 function slugify(s) {
   return (s || "")
     .toString()
@@ -23,20 +28,18 @@ function slugify(s) {
     .slice(0, 80) || "video";
 }
 
-// aman untuk YAML string
+// Aman untuk YAML string (menghindari error jika judul ada tanda kutip)
 function yamlEscape(s) {
   const t = (s ?? "").toString().replace(/"/g, '\\"');
   return `"${t}"`;
 }
 
-// NOTE: thumbnail URL
-// Docs Cloudflare menunjukkan format thumbnail berbasis domain customer-*.cloudflarestream.com
-// Kalau kamu belum punya domain customer, pakai videodelivery.net sering dipakai untuk thumbnail.
-// Kamu bisa ubah sesuai setup kamu.
+// Format thumbnail Cloudflare Stream
 function thumbUrl(uid) {
   return `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg?time=1s`;
 }
 
+// Helper untuk fetch ke API Cloudflare
 async function cfFetch(url) {
   const res = await fetch(url, {
     headers: {
@@ -51,30 +54,29 @@ async function cfFetch(url) {
   return res.json();
 }
 
-// List videos (up to 1000)
+// Ambil daftar video
 async function listVideos() {
-  const url = `https://api.cloudflare.com/client/v4/accounts/${ACCOUNT_ID}/stream`;
+  const url = `https://api.api.cloudflare.com/client/v4/accounts/${ACCOUNT_ID}/stream`;
   const data = await cfFetch(url);
-  // Cloudflare API returns { success, result, ... }
   return data.result || [];
 }
 
+// Fungsi untuk men-generate isi konten Markdown
 function mdForVideo(v) {
   const uid = v.uid;
   const title = v?.meta?.name || `Video ${uid}`;
   const created = v.created || "";
   const duration = v.duration ?? "";
+  const slug = slugify(title);
 
-  // default kategori/tag bisa kamu ubah
   const category = "video";
   const tags = ["cloudflare-stream"];
 
-  const fm =
-`---
+  return `---
 title: ${yamlEscape(title)}
 description: ${yamlEscape("")}
 layout: video.njk
-permalink: "/posts/${slugify(title)}/"
+permalink: "/posts/${slug}/"
 category: ${yamlEscape(category)}
 tags: [${tags.map(yamlEscape).join(", ")}]
 video:
@@ -87,27 +89,46 @@ duration: ${yamlEscape(duration)}
 
 Tulis deskripsi lengkap di sini (optional).
 `;
-
-  return fm;
 }
 
+// Fungsi Utama
 (async () => {
-  const videos = await listVideos();
-  console.log(`Found ${videos.length} videos`);
+  try {
+    const videos = await listVideos();
+    console.log(`Found ${videos.length} videos`);
 
-  let createdCount = 0;
-  for (const v of videos) {
-    const uid = v.uid;
-    const title = v?.meta?.name || `Video ${uid}`;
-    const slug = uid;
+    let createdCount = 0;
+    let skippedCount = 0;
 
-    // filename pakai uid biar unik (menghindari judul sama)
-    const file = path.join(POSTS_DIR, `${slug}__${uid}.md`);
+    for (const v of videos) {
+      const uid = v.uid;
+      const title = v?.meta?.name || `Video ${uid}`;
+      
+      // Buat slug untuk nama file
+      const slug = slugify(title);
+      
+      // Gunakan kombinasi slug dan UID agar file selalu unik (mencegah overwrite jika judul sama)
+      const fileName = `${slug}-${uid}.md`;
+      const filePath = path.join(POSTS_DIR, fileName);
 
-    if (fs.existsSync(file)) continue; // sudah ada, skip (aman)
-    fs.writeFileSync(path.join(POSTS_DIR, `${slug}.md`), md, "utf8");
-    createdCount++;
+      // Cek jika file sudah ada
+      if (fs.existsSync(filePath)) {
+        skippedCount++;
+        continue; 
+      }
+
+      // GENERATE KONTEN (Memperbaiki error 'md is not defined')
+      const mdContent = mdForVideo(v);
+
+      // TULIS FILE
+      fs.writeFileSync(filePath, mdContent, "utf8");
+      createdCount++;
+    }
+
+    console.log("---");
+    console.log(`Success: ${createdCount} new posts created.`);
+    console.log(`Skipped: ${skippedCount} existing posts.`);
+  } catch (err) {
+    console.error("Execution failed:", err.message);
   }
-
-  console.log(`Created ${createdCount} new post files.`);
 })();
