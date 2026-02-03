@@ -99,13 +99,13 @@ Tulis deskripsi lengkap di sini (optional).
   for (const v of videos) {
     const uid = v.uid;
     const title = v?.meta?.name || `Video ${uid}`;
-    const slug = slugify(title);
+    const slug = uid;
 
     // filename pakai uid biar unik (menghindari judul sama)
     const file = path.join(POSTS_DIR, `${slug}__${uid}.md`);
 
     if (fs.existsSync(file)) continue; // sudah ada, skip (aman)
-    fs.writeFileSync(file, mdForVideo(v), "utf8");
+    fs.writeFileSync(path.join(POSTS_DIR, `${slug}.md`), md, "utf8");
     createdCount++;
   }
 

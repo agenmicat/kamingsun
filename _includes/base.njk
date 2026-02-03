@@ -10,10 +10,25 @@
     {% set siteUrl = site.url %}
   {% endif %}
   {% set canonical = siteUrl + page.url %}
+  
+  {% set siteName = "AgenMicat" %}
+  {% if site and site.name %}
+    {% set siteName = site.name %}
+  {% endif %}
 
-  <title>{% if title %}{{ title }} · {% endif %}AgenMicat</title>
+  {% set pageTitle = siteName %}
+  {% if title %}
+    {% set pageTitle = title + " · " + siteName %}
+  {% endif %}
+  {% if title and video %}
+    {% set pageTitle = "Nonton Video " + title + " di " + siteName %}
+  {% endif %}
+  <title>{{ pageTitle }}</title>
 
-  {% set metaDesc = "Blog video AgenMicat – kumpulan video pilihan, tutorial, dan hiburan." %}
+  {% set metaDesc = "Blog video " + siteName + " – kumpulan video pilihan, tutorial, dan hiburan." %}
+  {% if title and video %}
+    {% set metaDesc = "Anda sedang menonton video " + title + " di website " + siteName + "." %}
+  {% endif %}
   {% if description %}
     {% set metaDesc = description %}
   {% endif %}

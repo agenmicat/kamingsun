@@ -33,7 +33,10 @@ module.exports = function (eleventyConfig) {
     });
     return [...cats].sort();
   });
-
+  eleventyConfig.addGlobalData("site", {
+    url: "https://agenmicat.pages.dev",
+    name: "AgenMicat"
+  });
   // Site global (dipakai untuk canonical + sitemap)
   eleventyConfig.addGlobalData("site", {
     url: "https://agenmicat.pages.dev",
