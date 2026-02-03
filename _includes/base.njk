@@ -72,6 +72,72 @@
   <meta property="og:description" content="{{ ogDesc }}" />
   <meta property="og:url" content="{{ canonical }}" />
   <meta property="og:image" content="{{ ogImage }}" />
+  {# ================= Schema.org VideoObject (JSON-LD) ================= #}
+  {% if video and title %}
+    {% set siteUrl = "" %}
+    {% if site and site.url %}{% set siteUrl = site.url %}{% endif %}
+    {% set pageUrl = siteUrl + page.url %}
+
+    {# description fallback (kalau tidak diisi) #}
+    {% set schemaDesc = description %}
+    {% if not schemaDesc %}
+      {% set siteName = "AgenMicat" %}
+      {% if site and site.name %}{% set siteName = site.name %}{% endif %}
+      {% set schemaDesc = "Anda sedang menonton video " + title + " di website " + siteName + "." %}
+    {% endif %}
+
+    {# thumbnail fallback (universal) #}
+    {% set schemaThumb = thumbnail %}
+    {% if (not schemaThumb) and video.provider == "youtube" and video.id %}
+      {% set schemaThumb = "https://i.ytimg.com/vi/" + video.id + "/hqdefault.jpg" %}
+    {% endif %}
+    {% if (not schemaThumb) and video.provider == "cloudflare" and video.id %}
+      {% set schemaThumb = "https://videodelivery.net/" + video.id + "/thumbnails/thumbnail.jpg" %}
+    {% endif %}
+    {% if schemaThumb and schemaThumb[0] == "/" %}
+      {% set schemaThumb = siteUrl + schemaThumb %}
+    {% endif %}
+
+    {# embedUrl/contentUrl sesuai provider #}
+    {% set embedUrl = "" %}
+    {% set contentUrl = "" %}
+
+    {% if video.provider == "youtube" and video.id %}
+      {% set embedUrl = "https://www.youtube.com/embed/" + video.id %}
+    {% elif video.provider == "cloudflare" and video.id %}
+      {% set embedUrl = "https://iframe.videodelivery.net/" + video.id %}
+    {% elif video.provider == "bunny" and video.zone and video.id %}
+      {% set embedUrl = "https://iframe.mediadelivery.net/embed/" + video.zone + "/" + video.id %}
+    {% elif video.provider == "self" and video.src %}
+      {% set contentUrl = video.src %}
+      {% if contentUrl[0] == "/" %}
+        {% set contentUrl = siteUrl + contentUrl %}
+      {% endif %}
+    {% endif %}
+
+    {# uploadDate + duration optional #}
+    {% set uploadDate = "" %}
+    {% if created %}{% set uploadDate = created | isoDateTime %}{% endif %}
+
+    {% set durIso = "" %}
+    {% if duration %}{% set durIso = duration | isoDuration %}{% endif %}
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "VideoObject",
+      "name": {{ title | dump }},
+      "description": {{ schemaDesc | dump }},
+      "thumbnailUrl": [ {{ schemaThumb | dump }} ],
+      "url": {{ pageUrl | dump }}{% if uploadDate %},
+      "uploadDate": {{ uploadDate | dump }}{% endif %}{% if durIso %},
+      "duration": {{ durIso | dump }}{% endif %}{% if embedUrl %},
+      "embedUrl": {{ embedUrl | dump }}{% endif %}{% if contentUrl %},
+      "contentUrl": {{ contentUrl | dump }}{% endif %}
+    }
+    </script>
+  {% endif %}
+
 </head>
 
 <body>

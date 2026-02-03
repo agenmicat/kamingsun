@@ -14,6 +14,28 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addCollection("posts", (collectionApi) => {
     return collectionApi.getFilteredByGlob("posts/*.md").reverse();
   });
+  // ISO datetime: 2026-02-03T10:20:30.000Z
+  eleventyConfig.addFilter("isoDateTime", (value) => {
+    if (!value) return "";
+    const d = new Date(value);
+      return d.toISOString();
+  });
+
+  // seconds -> ISO 8601 duration: PT1H2M3S
+  eleventyConfig.addFilter("isoDuration", (seconds) => {
+    const s = Number(seconds);
+    if (!Number.isFinite(s) || s <= 0) return "";
+    let rem = Math.floor(s);
+    const h = Math.floor(rem / 3600); rem -= h * 3600;
+    const m = Math.floor(rem / 60);   rem -= m * 60;
+    const sec = rem;
+
+    let out = "PT";
+    if (h) out += `${h}H`;
+    if (m) out += `${m}M`;
+    if (sec || (!h && !m)) out += `${sec}S`;
+    return out;
+  });
 
   // Tag list untuk halaman /tags
   eleventyConfig.addCollection("tagList", (collectionApi) => {
